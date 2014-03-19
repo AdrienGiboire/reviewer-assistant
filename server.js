@@ -9,7 +9,7 @@ app.set('org', 'nukomeet');
 app.set('client_id', '1c261069c274bc4ee749');
 app.set('client_secret', 'e527a4bd591c1d7437f3dec92916d507c38c3016');
 
-var options = {
+var _options = {
   headers: {
     'User-Agent': app.get('org')
   },
@@ -17,27 +17,28 @@ var options = {
 };
 
 app.get('/pull-requests', function (request, response) {
-  response.type('html');
-  response.writeHead(200);
   fetchRepos(fetchPullRequests, response);
   app.on('pull-requests:fetched', function (pullRequestsByRepo) {
+    var html = "";
+
     _.each(pullRequestsByRepo, function (pullRequests) {
-      response.write('There is <strong>'+ pullRequests.length +'</strong> pending pull request(s) for <strong>'+ pullRequests[0].title +'</strong>:');
-      response.write('<ul>');
+      html += 'There is <strong>'+ pullRequests.length +'</strong> pending pull request(s) for <strong>'+ pullRequests[0].title +'</strong>:';
+      html += '<ul>';
       _.each(pullRequests, function (pullRequest) {
-        response.write('<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.url +'">'+ pullRequest.url +'</a>)</li>');
+        html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.url +'">'+ pullRequest.url +'</a>)</li>';
       });
-      response.write('</ul>');
+      html += '</ul>';
     });
-    response.end();
+
+    response.send(html);
   });
 });
 
 function fetchRepos (callback, response) {
-  options.path = '/orgs/'+ app.get('org') +'/repos?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
+  _options.path = '/orgs/'+ app.get('org') +'/repos?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
 
   // Fetch the list of repos for a given organisation
-  var request = https.get(options, function (res) {
+  var request = https.get(_options, function (res) {
     data = "";
 
     res.on('data', function (chunk) {
@@ -58,8 +59,8 @@ function fetchRepos (callback, response) {
 function fetchPullRequests (repos, response) {
   var pullRequests = [];
   _.each(repos, function (repo, index) {
-    options.path = '/repos/'+ app.get('org') +'/'+ repo.name +'/pulls?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
-    var request = https.get(options, function (res) {
+    _options.path = '/repos/'+ app.get('org') +'/'+ repo.name +'/pulls?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
+    var request = https.get(_options, function (res) {
       (function () {
         var data = "";
 
