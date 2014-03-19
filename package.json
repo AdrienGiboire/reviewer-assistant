@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/AdrienGiboire/reviewer-assistant/issues"
   },
-  "homepage": "https://github.com/AdrienGiboire/reviewer-assistant"
+  "homepage": "https://github.com/AdrienGiboire/reviewer-assistant",
+  "engines": {
+    "node": "0.10.x"
+  }
 }
