@@ -17,8 +17,10 @@ var _options = {
 };
 
 app.get('/pull-requests', function (request, response) {
-  fetchRepos(fetchPullRequests, response);
-  app.on('pull-requests:fetched', function (pullRequestsByRepo) {
+  fetchRepos(fetchPullRequests);
+
+  app.once('pull-requests:fetched', function (pullRequestsByRepo) {
+    response.writeHead(200, {'Content-Type': 'text/html'});
     var html = "";
 
     _.each(pullRequestsByRepo, function (pullRequests) {
@@ -30,11 +32,12 @@ app.get('/pull-requests', function (request, response) {
       html += '</ul>';
     });
 
-    response.send(html);
+    response.write(html);
+    response.end();
   });
 });
 
-function fetchRepos (callback, response) {
+function fetchRepos (callback) {
   _options.path = '/orgs/'+ app.get('org') +'/repos?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
 
   // Fetch the list of repos for a given organisation
@@ -47,7 +50,7 @@ function fetchRepos (callback, response) {
 
     res.on('end', function () {
       var repos = JSON.parse(data);
-      return callback(repos, response);
+      return callback(repos);
     });
   });
 
@@ -56,7 +59,7 @@ function fetchRepos (callback, response) {
   });
 }
 
-function fetchPullRequests (repos, response) {
+function fetchPullRequests (repos) {
   var pullRequests = [];
   _.each(repos, function (repo, index) {
     _options.path = '/repos/'+ app.get('org') +'/'+ repo.name +'/pulls?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
