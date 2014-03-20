@@ -25,8 +25,8 @@ app.get('/pull-requests', function (request, response) {
     response.writeHead(200, {'Content-Type': 'text/html'});
     var html = "";
 
-    _.each(pullRequestsByRepo, function (pullRequests) {
-      html += 'There is <strong>'+ pullRequests.data.length +'</strong> pending pull request(s) for <strong>'+ pullRequestsByRepo[0].repo +'</strong>:';
+    _.each(pullRequestsByRepo, function (pullRequests, index) {
+      html += 'There is <strong>'+ pullRequests.data.length +'</strong> pending pull request(s) for <strong>'+ pullRequestsByRepo[index].repo +'</strong>:';
       html += '<ul>';
       _.each(pullRequests.data, function (pullRequest) {
         html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.url +'">'+ pullRequest.url +'</a>)</li>';
