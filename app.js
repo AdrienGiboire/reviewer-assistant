@@ -6,13 +6,14 @@ var app = express();
 
 app.use(express.compress());
 
-app.set('org', 'nukomeet');
-app.set('client_id', '1c261069c274bc4ee749');
-app.set('client_secret', 'e527a4bd591c1d7437f3dec92916d507c38c3016');
+app.set('ORGANISATION', 'nukomeet');
+app.set('GITHUB_CLIENT_ID', '1c261069c274bc4ee749');
+app.set('GITHUB_CLIENT_SECRET', 'e527a4bd591c1d7437f3dec92916d507c38c3016');
+app.set('HIPCHAT_KEY', '6c35c6f8d1a650d746faec37d3d93b');
 
 var _options = {
   headers: {
-    'User-Agent': app.get('org')
+    'User-Agent': app.get('ORGANISATION')
   },
   hostname: 'api.github.com'
 };
@@ -33,7 +34,7 @@ app.get('/pull-requests', function (request, response) {
       html += '</ul>';
     });
 
-    var HC = new hipchat('6c35c6f8d1a650d746faec37d3d93b');
+    var HC = new hipchat(app.get('HIPCHAT_KEY'));
 
     var params = {
       room: 55413,
@@ -50,7 +51,7 @@ app.get('/pull-requests', function (request, response) {
 });
 
 function fetchRepos (callback) {
-  _options.path = '/orgs/'+ app.get('org') +'/repos?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
+  _options.path = '/orgs/'+ app.get('ORGANISATION') +'/repos?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
 
   // Fetch the list of repos for a given organisation
   var request = https.get(_options, function (res) {
@@ -74,7 +75,7 @@ function fetchRepos (callback) {
 function fetchPullRequests (repos) {
   var pullRequests = [];
   _.each(repos, function (repo, index) {
-    _options.path = '/repos/'+ app.get('org') +'/'+ repo.name +'/pulls?client_id='+ app.get('client_id') +'&client_secret='+ app.get('client_secret');
+    _options.path = '/repos/'+ app.get('ORGANISATION') +'/'+ repo.name +'/pulls?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
     var request = https.get(_options, function (res) {
       (function (repo) {
         var data = "";
