@@ -7,9 +7,9 @@ var app = express();
 app.use(express.compress());
 
 app.set('ORGANISATION', 'nukomeet');
-app.set('GITHUB_CLIENT_ID', '1c261069c274bc4ee749');
-app.set('GITHUB_CLIENT_SECRET', 'e527a4bd591c1d7437f3dec92916d507c38c3016');
-app.set('HIPCHAT_KEY', '6c35c6f8d1a650d746faec37d3d93b');
+app.set('GITHUB_CLIENT_ID', process.env.GH_BASIC_CLIENT_ID);
+app.set('GITHUB_CLIENT_SECRET', process.env.GH_BASIC_SECRET_ID);
+app.set('HIPCHAT_KEY', process.env.HIPCHAT_KEY);
 
 var _options = {
   headers: {
