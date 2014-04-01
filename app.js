@@ -1,19 +1,24 @@
 var _ = require('underscore');
 var express = require('express');
-var https = require('https');
 var hipchat = require('node-hipchat');
+var https = require('https');
+var url = require('url');
+var querystring = require('querystring');
 var app = express();
 
 app.use(express.compress());
 
 app.set('ORGANISATION', 'nukomeet');
-app.set('GITHUB_CLIENT_ID', process.env.GH_BASIC_CLIENT_ID);
-app.set('GITHUB_CLIENT_SECRET', process.env.GH_BASIC_SECRET_ID);
+app.set('BASE_URL', process.env.BASE_URL || 'http://localhost:5000/');
+app.set('GITHUB_AUTH_TOKEN', process.env.GH_AUTH_TOKEN);
+app.set('GITHUB_CLIENT_ID', process.env.GH_CLIENT_ID);
+app.set('GITHUB_CLIENT_SECRET', process.env.GH_CLIENT_SECRET);
 app.set('HIPCHAT_KEY', process.env.HIPCHAT_KEY);
 
 var _options = {
   headers: {
-    'User-Agent': app.get('ORGANISATION')
+    'User-Agent': app.get('ORGANISATION'),
+    'Authorization': 'token '+ app.get('GITHUB_AUTH_TOKEN')
   },
   hostname: 'api.github.com'
 };
@@ -68,7 +73,7 @@ function fetchRepos (callback) {
   });
 
   request.on('error', function (error) {
-    console.log('Problem with request: '+ e);
+    console.log('Problem with request: '+ error);
   });
 }
 
