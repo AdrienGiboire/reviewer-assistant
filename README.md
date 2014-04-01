@@ -12,8 +12,8 @@ the `client_secret` for the app..
 Then run the following command:
 
 ```
-$ GB_CLIENT_BASIC_ID='<your_client_id>'; \
-  GB_CLIENT_SECRET_ID='<your_client_secret>'; \
+$ GB_AUTH_TOKEN='<your_github_auth_token>'; \
+  BB_AUTH_TOKEN='<your_bitbucket_auth_token>' \
   HIPCHAT_KEY='<your_hipchat_key>' \
   node app.js
 ```
