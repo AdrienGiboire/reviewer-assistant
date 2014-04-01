@@ -11,8 +11,6 @@ app.use(express.compress());
 app.set('ORGANISATION', 'nukomeet');
 app.set('BASE_URL', process.env.BASE_URL || 'http://localhost:5000/');
 app.set('GITHUB_AUTH_TOKEN', process.env.GH_AUTH_TOKEN);
-app.set('GITHUB_CLIENT_ID', process.env.GH_CLIENT_ID);
-app.set('GITHUB_CLIENT_SECRET', process.env.GH_CLIENT_SECRET);
 app.set('HIPCHAT_KEY', process.env.HIPCHAT_KEY);
 
 var _options = {
@@ -56,7 +54,7 @@ app.get('/pull-requests', function (request, response) {
 });
 
 function fetchRepos (callback) {
-  _options.path = '/orgs/'+ app.get('ORGANISATION') +'/repos?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
+  _options.path = '/orgs/'+ app.get('ORGANISATION') +'/repos';
 
   // Fetch the list of repos for a given organisation
   var request = https.get(_options, function (res) {
@@ -80,7 +78,7 @@ function fetchRepos (callback) {
 function fetchPullRequests (repos) {
   var pullRequests = [];
   _.each(repos, function (repo, index) {
-    _options.path = '/repos/'+ app.get('ORGANISATION') +'/'+ repo.name +'/pulls?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
+    _options.path = '/repos/'+ app.get('ORGANISATION') +'/'+ repo.name +'/pulls';
     var request = https.get(_options, function (res) {
       (function (repo) {
         var data = "";
