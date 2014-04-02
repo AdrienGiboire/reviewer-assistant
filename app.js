@@ -102,6 +102,11 @@ function fetchPullRequests (repos) {
   });
 }
 
+app.get('/', function (request, response) {
+  response.redirect('/pull-requests');
+  response.end();
+});
+
 var port = Number(process.env.PORT || 5000);
 var server = app.listen(port, function () {
   console.log('Listening on port %d', server.address().port);
