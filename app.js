@@ -1,19 +1,22 @@
 var _ = require('underscore');
 var express = require('express');
-var https = require('https');
 var hipchat = require('node-hipchat');
+var https = require('https');
+var url = require('url');
+var querystring = require('querystring');
 var app = express();
 
 app.use(express.compress());
 
 app.set('ORGANISATION', 'nukomeet');
-app.set('GITHUB_CLIENT_ID', '1c261069c274bc4ee749');
-app.set('GITHUB_CLIENT_SECRET', 'e527a4bd591c1d7437f3dec92916d507c38c3016');
-app.set('HIPCHAT_KEY', '6c35c6f8d1a650d746faec37d3d93b');
+app.set('BASE_URL', process.env.BASE_URL || 'http://localhost:5000/');
+app.set('GITHUB_AUTH_TOKEN', process.env.GH_AUTH_TOKEN);
+app.set('HIPCHAT_KEY', process.env.HIPCHAT_KEY);
 
 var _options = {
   headers: {
-    'User-Agent': app.get('ORGANISATION')
+    'User-Agent': app.get('ORGANISATION'),
+    'Authorization': 'token '+ app.get('GITHUB_AUTH_TOKEN')
   },
   hostname: 'api.github.com'
 };
@@ -29,7 +32,7 @@ app.get('/pull-requests', function (request, response) {
       html += 'There is <strong>'+ pullRequests.data.length +'</strong> pending pull request(s) for <strong>'+ pullRequestsByRepo[index].repo +'</strong>:';
       html += '<ul>';
       _.each(pullRequests.data, function (pullRequest) {
-        html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.url +'">'+ pullRequest.url +'</a>)</li>';
+        html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.html_url +'">'+ pullRequest.html_url +'</a>)</li>';
       });
       html += '</ul>';
     });
@@ -51,7 +54,7 @@ app.get('/pull-requests', function (request, response) {
 });
 
 function fetchRepos (callback) {
-  _options.path = '/orgs/'+ app.get('ORGANISATION') +'/repos?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
+  _options.path = '/orgs/'+ app.get('ORGANISATION') +'/repos';
 
   // Fetch the list of repos for a given organisation
   var request = https.get(_options, function (res) {
@@ -68,14 +71,14 @@ function fetchRepos (callback) {
   });
 
   request.on('error', function (error) {
-    console.log('Problem with request: '+ e);
+    console.log('Problem with request: '+ error);
   });
 }
 
 function fetchPullRequests (repos) {
   var pullRequests = [];
   _.each(repos, function (repo, index) {
-    _options.path = '/repos/'+ app.get('ORGANISATION') +'/'+ repo.name +'/pulls?client_id='+ app.get('GITHUB_CLIENT_ID') +'&client_secret='+ app.get('GITHUB_CLIENT_SECRET');
+    _options.path = '/repos/'+ app.get('ORGANISATION') +'/'+ repo.name +'/pulls';
     var request = https.get(_options, function (res) {
       (function (repo) {
         var data = "";
@@ -98,6 +101,11 @@ function fetchPullRequests (repos) {
     });
   });
 }
+
+app.get('/', function (request, response) {
+  response.redirect('/pull-requests');
+  response.end();
+});
 
 var port = Number(process.env.PORT || 5000);
 var server = app.listen(port, function () {
