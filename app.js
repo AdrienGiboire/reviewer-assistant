@@ -32,7 +32,7 @@ app.get('/pull-requests', function (request, response) {
       html += 'There is <strong>'+ pullRequests.data.length +'</strong> pending pull request(s) for <strong>'+ pullRequestsByRepo[index].repo +'</strong>:';
       html += '<ul>';
       _.each(pullRequests.data, function (pullRequest) {
-        html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.url +'">'+ pullRequest.url +'</a>)</li>';
+        html += '<li><em>'+ pullRequest.title +'</em> (<a href="'+ pullRequest.html_url +'">'+ pullRequest.html_url +'</a>)</li>';
       });
       html += '</ul>';
     });
